@@ -63,7 +63,7 @@ class Player(pygame.sprite.Sprite):
         self.movement()
         self.animate()
         self.collide_enemy()
-        
+        self.collide_potion()
 
         self.rect.x += self.x_change
         self.collide_blocks("x")
@@ -96,6 +96,8 @@ class Player(pygame.sprite.Sprite):
             #     sprite.rect.y -= PLAYER_SPEED
             self.y_change += PLAYER_SPEED
             self.facing = 'down'
+        if keys[pygame.K_e]:
+            self.game.inventory()
     
     def collide_blocks(self, direction):
         if direction == "x":
@@ -171,11 +173,15 @@ class Player(pygame.sprite.Sprite):
     def collide_enemy(self):
         hits = pygame.sprite.spritecollide(self, self.game.enemies, False)
         if hits:
-            print(self.health)
             self.health -=1
             if self.health == 0:
                 self.kill()
                 self.game.playing = False
+
+    def collide_potion(self):
+        hits = pygame.sprite.spritecollide(self, self.game.potions, True)
+        if hits:
+            self.health += 20
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -476,3 +482,44 @@ class Attack(pygame.sprite.Sprite):
             if self.animation_loop >= 5:
                 self.kill()
         
+class Rect_Bar:
+    def __init__(self, x, y, width, height, fg, bg, content, fontsize):
+        self.font = pygame.font.Font('arial.ttf', fontsize)
+
+        self.content = content
+
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+        self.fg = fg
+        self.bg = bg
+
+        self.image = pygame.Surface((self.width, self.height))
+        self.image.fill(self.bg)
+        self.rect = self.image.get_rect()
+
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.text = self.font.render(self.content, True, self.fg)
+        self.text_rect = self.text.get_rect(center=(self.width/2, self.height/2))
+        self.image.blit(self.text, self.text_rect)
+
+class Potion(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self._layer = GROUND_LAYER
+        self.groups = self.game.all_sprites, self.game.potions
+        pygame.sprite.Sprite.__init__(self, self.groups)
+
+        self.x = x * TILE_SIZE
+        self.y = y * TILE_SIZE
+        self.width = TILE_SIZE
+        self.height = TILE_SIZE
+
+        self.image = self.game.potion_img
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
