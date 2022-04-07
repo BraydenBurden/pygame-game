@@ -8,6 +8,13 @@ class Game:
         # new game starts
         pygame.init()
         pygame.font.init()
+        pygame.mixer.init()
+
+        self.attack = pygame.mixer.Sound("sounds/attack.wav")
+        self.dead = pygame.mixer.Sound("sounds/dead.wav")
+        self.drink_potion = pygame.mixer.Sound("sounds/drink.wav")
+        
+
         self.screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
@@ -57,6 +64,8 @@ class Game:
                 self.running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    pygame.mixer.Sound.set_volume(self.attack, 0.2)
+                    pygame.mixer.Sound.play(self.attack)
                     if self.player.facing == 'up':
                         Attack(self, self.player.rect.x, self.player.rect.y - TILE_SIZE)
                     if self.player.facing == 'down':
@@ -247,6 +256,10 @@ class Game:
             self.clock.tick(FPS)
             pygame.display.update()
 
+pygame.mixer.init()
+pygame.mixer.music.load("sounds/background_music.wav")
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play(-1)
 g = Game()
 g.intro_screen()
 g.new()

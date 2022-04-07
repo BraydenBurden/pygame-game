@@ -175,13 +175,20 @@ class Player(pygame.sprite.Sprite):
         if hits:
             self.health -=1
             if self.health == 0:
+                pygame.mixer.Sound.set_volume(self.game.dead, 0.3)
+                pygame.mixer.Sound.play(self.game.dead)
                 self.kill()
                 self.game.playing = False
 
     def collide_potion(self):
         hits = pygame.sprite.spritecollide(self, self.game.potions, True)
         if hits:
-            self.health += 20
+            pygame.mixer.Sound.set_volume(self.game.drink_potion, 0.2)
+            pygame.mixer.Sound.play(self.game.drink_potion)
+            if self.health < 80:
+                self.health += 20
+            elif self.health >= 80:
+                self.health = 100
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -302,6 +309,8 @@ class Enemy(pygame.sprite.Sprite):
             print(f'enemy {self.health}')
             self.health -=1
             if self.health == 0:
+                pygame.mixer.Sound.set_volume(self.game.dead, 0.3)
+                pygame.mixer.Sound.play(self.game.dead)
                 self.kill()
 
     def collide_blocks(self, direction):
